@@ -167,13 +167,25 @@ void
 syscall(void)
 {
   int num;
+  int ret;
+  struct record rec_no, rec_ret;
   
   num = proc->tf->eax;
+  
+  rec_no.type = SYSCALL_NO;
+  rec_no.value = num;
+  addrecordtolist(proc->recl, rec_no);
+  
   if(num >= 0 && num < NELEM(syscalls) && syscalls[num])
-    proc->tf->eax = syscalls[num]();
+    ret = syscalls[num]();
+    proc->tf->eax = ret;
   else {
     cprintf("%d %s: unknown sys call %d\n",
             proc->pid, proc->name, num);
     proc->tf->eax = -1;
   }
+  
+  rec_ret.type = RET_VALUE;
+  rec_ret.value = ret;
+  addrecordtolist(proc->recl, rec_ret);
 }
