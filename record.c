@@ -1,10 +1,31 @@
 #include "record.h"
 #include "proc.h"
 
-int startrecording();
-int stoprecording();
-int fetchrecords(struct record *records, int num_records);
+int startrecording(){
+  if( proc->recording == 0 ){
+    proc->recording = 1;
+    return 0;
+  }
+  return -1;
+}
 
+int stoprecording(){
+  if( proc->recording == 1 ){
+    proc->recording = 0;
+    return 0;
+  }
+  return -1;
+}
+
+int fetchrecords(struct record *records, int num_records){
+  int i;
+   
+  if( records == NULL)
+    fetchrecordslist(proc->recl);
+  else
+    for( i = 0; i < num_records; i++)
+      printrecord(records[i]);
+}
 
 int addrecordtolist(reclist list, struct record rec){
   reclist aux;
@@ -53,104 +74,83 @@ reclist copyrecordslist(reclist list){
   return new;
 }
 
-void printrecord(struct record rec){
-  
-  switch(rec.type){
-    case SYSCALL_NO:
-        cprintf("SYSCALL_NO: %s\n",translatesyscall(rec.value));
-        break;
-    case ARG_INTEGER:
-        cprintf("ARG_INTEGER: %d\n",rec.value):
-        break;
-    case ARG_POINTER:
-        cprintf("ARG_POINTER: %p\n",rec.value):
-        break;
-    case ARG_STRING:
-        cprintf("ARG_STRING: %s\n",rec.value):
-        break;
-    case RET_VALUE:
-        cprintf("RET_VALUE: %d\n",rec.value):
-        break;
-    }
-}
-
+/* Tranforma o numero da System Call no respectivo nome */
 char* translatesyscall(int sc){
 
   switch(sc)
     case 1:
       return "SYS_fork";
     case 2:
-      return 
+      return "SYS_exit";
     case 3:
-      return 
+      return "SYS_wait";
     case 4:
-      return 
+      return "SYS_pipe";
     case 5:
-      return 
+      return "SYS_write";
     case 6:
-      return 
+      return "SYS_read";
     case 7:
-      return 
+      return "SYS_close";
     case 8:
-      return 
+      return "SYS_kill";
     case 9:
-      return 
+      return "SYS_exec";
     case 10:
-      return 
+      return "SYS_open";
     case 11:
-      return 
+      return "SYS_mknod";
     case 12:
-      return 
+      return "SYS_unlink";
     case 13:
-      return 
+      return "SYS_fstat";
     case 14:
-      return 
+      return "SYS_link";
     case 15:
-      return 
+      return "SYS_mkdir";
     case 16:
-      return 
+      return "SYS_chdir";
     case 17:
-      return 
+      return "SYS_dup";
     case 18:
-      return 
+      return "SYS_getpid";
     case 19:
-      return 
+      return "SYS_sbrk";
     case 20:
-      return 
+      return "SYS_sleep";
     case 21:
-      return 
+      return "SYS_uptime";
     case 22:
-      return 
+      return "SYS_startrecording";
     case 23:
-      return 
+      return "SYS_stoprecording";
     case 24:
-      return 
- 
+      return "SYS_fetchrecords";
+    default:
+      return "Doesn't exist";
+}
 
-#define             1
-#define SYS_exit            2
-#define SYS_wait            3
-#define SYS_pipe            4
-#define SYS_write           5
-#define SYS_read            6
-#define SYS_close           7
-#define SYS_kill            8
-#define SYS_exec            9
-#define SYS_open           10
-#define SYS_mknod          11
-#define SYS_unlink         12
-#define SYS_fstat          13
-#define SYS_link           14
-#define SYS_mkdir          15
-#define SYS_chdir          16
-#define SYS_dup            17
-#define SYS_getpid         18
-#define SYS_sbrk           19
-#define SYS_sleep          20
-#define SYS_uptime         21
-#define SYS_startrecording 22
-#define SYS_stoprecording  23
-#define SYS_fetchrecords   24
+void printrecord(struct record rec){
+  
+  switch(rec.type){
+    case SYSCALL_NO:
+        cprintf("SYSCALL_NO: %s\n",translatesyscall(rec.value.intval));
+        break;
+    case ARG_INTEGER:
+        cprintf("ARG_INTEGER: %d\n",rec.value.intval):
+        break;
+    case ARG_POINTER:
+        cprintf("ARG_POINTER: %p\n",rec.value.ptrvalue):
+        break;
+    case ARG_STRING:
+        cprintf("ARG_STRING: %s\n",rec.value.strval):
+        break;
+    case RET_VALUE:
+        cprintf("RET_VALUE: %d\n",rec.value.intval):
+        break;
+    }
+}
+
 
 
 
