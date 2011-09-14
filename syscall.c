@@ -50,7 +50,7 @@ argint(int n, int *ip)
   
   ret = fetchint(proc, proc->tf->esp + 4 + 4*n, ip);
   rec.type = ARG_INTEGER;
-  rec.value = *ip;
+  rec.value.intval = *ip;
   addrecordtolist(proc->recl, rec);
   
   return ret;
@@ -73,7 +73,7 @@ argptr(int n, char **pp, int size)
   *pp = (char*)i;
   
   rec.type = ARG_PTR;
-  rec.value = *pp;
+  rec.value.ptrval = *pp;
   addrecordtolist(proc->recl, rec);
   
   return 0;
@@ -100,12 +100,11 @@ argstr(int n, char **pp)
   
   for(i = 0; i < 20; i++){
     if(i < ret){
-      rec.value[i] = *pp[i];
+      rec.value.strval[i] = *pp[i];
     }else{
-      rec.value[i] = ' ';
+      rec.value.strval[i] = ' ';
     }
   }
-  
   addrecordtolist(proc->recl, rec);
   
   return ret;
@@ -173,7 +172,7 @@ syscall(void)
   num = proc->tf->eax;
   
   rec_no.type = SYSCALL_NO;
-  rec_no.value = num;
+  rec_no.value.intval = num;
   addrecordtolist(proc->recl, rec_no);
   
   if(num >= 0 && num < NELEM(syscalls) && syscalls[num])
@@ -186,6 +185,6 @@ syscall(void)
   }
   
   rec_ret.type = RET_VALUE;
-  rec_ret.value = ret;
+  rec_ret.value.intval = ret;
   addrecordtolist(proc->recl, rec_ret);
 }
