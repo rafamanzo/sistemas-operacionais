@@ -156,7 +156,12 @@ void printrecord(struct record rec){
 
 
 
-int fetchrecordslist(reclist list);
+int fetchrecordslist(reclist list){
+  reclist runner;
+  
+  for(runner = list; runner != NULL; runner = runner->next)
+    printrecord(runner->rec);
+}
 int releaserecordslist(reclist list);
 
 
