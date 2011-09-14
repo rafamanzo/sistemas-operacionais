@@ -3,6 +3,7 @@
 #include "param.h"
 #include "mmu.h"
 #include "x86.h"
+#include "record.h"
 #include "proc.h"
 #include "spinlock.h"
 
@@ -67,6 +68,10 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
+  
+  // Set up syscall recording structure
+  p->recording = 0;
+  p->recl = NULL;
 
   return p;
 }
@@ -150,6 +155,9 @@ fork(void)
     if(proc->ofile[i])
       np->ofile[i] = filedup(proc->ofile[i]);
   np->cwd = idup(proc->cwd);
+  
+  np->recording = proc->recording;
+  np->recl = copyrecordslist(proc->recl);
  
   pid = np->pid;
   np->state = RUNNABLE;
@@ -179,6 +187,10 @@ exit(void)
 
   iput(proc->cwd);
   proc->cwd = 0;
+  
+  releaserecordslist(proc->reclist);
+  proc->reclist = NULL;
+  proc->recording = 0;
 
   acquire(&ptable.lock);
 
@@ -227,6 +239,9 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        releaserecordslist(proc->reclist);
+        proc->reclist = NULL;
+        proc->recording = 0;
         release(&ptable.lock);
         return pid;
       }
