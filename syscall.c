@@ -2,6 +2,7 @@
 #include "defs.h"
 #include "param.h"
 #include "mmu.h"
+#include "record.h"
 #include "proc.h"
 #include "x86.h"
 #include "syscall.h"
@@ -15,7 +16,7 @@
 // Fetch the int at addr from process p.
 int
 fetchint(struct proc *p, uint addr, int *ip)
-{
+{  
   if(addr >= p->sz || addr+4 > p->sz)
     return -1;
   *ip = *(int*)(addr);
@@ -44,7 +45,15 @@ fetchstr(struct proc *p, uint addr, char **pp)
 int
 argint(int n, int *ip)
 {
-  return fetchint(proc, proc->tf->esp + 4 + 4*n, ip);
+  int ret;
+  struct record rec;
+  
+  ret = fetchint(proc, proc->tf->esp + 4 + 4*n, ip);
+  rec->type = ARG_INTEGER;
+  rec->value = *ip;
+  addrecordtolist(proc->recl, rec);
+  
+  return ret;
 }
 
 // Fetch the nth word-sized system call argument as a pointer
@@ -54,12 +63,19 @@ int
 argptr(int n, char **pp, int size)
 {
   int i;
+  struct record rec;
   
   if(argint(n, &i) < 0)
     return -1;
   if((uint)i >= proc->sz || (uint)i+size > proc->sz)
     return -1;
+    
   *pp = (char*)i;
+  
+  rec->type = ARG_PTR;
+  rec->value = *pp;
+  addrecordtolist(proc->recl, rec);
+  
   return 0;
 }
 
@@ -71,9 +87,28 @@ int
 argstr(int n, char **pp)
 {
   int addr;
+  int ret;
+  int i;
+  struct record rec;
+  
   if(argint(n, &addr) < 0)
     return -1;
-  return fetchstr(proc, addr, pp);
+    
+  ret = fetchstr(proc, addr, pp);
+  
+  rec->type = ARG_STRING;
+  
+  for(i = 0; i < 20; i++){
+    if(i < ret){
+      rec->value[i] = *pp[i];
+    }else{
+      rec->value[i] = ' ';
+    }
+  }
+  
+  addrecordtolist(proc->recl, rec);
+  
+  return ret;
 }
 
 extern int sys_chdir(void);
