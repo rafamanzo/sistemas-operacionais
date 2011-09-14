@@ -161,7 +161,24 @@ int fetchrecordslist(reclist list){
   
   for(runner = list; runner != NULL; runner = runner->next)
     printrecord(runner->rec);
+    
+  return 1;
 }
-int releaserecordslist(reclist list);
+
+int releaserecordslist(reclist list){
+  reclist runner, next;
+  
+  runner = list; 
+  
+  while(runner != NULL){
+    next = runner->next;
+    kfree(runner);
+    runner = next; 
+  }
+  
+  return 1;
+  
+  return 1;
+}
 
 
