@@ -21,10 +21,12 @@ int fetchrecords(struct record *records, int num_records){
   int i;
    
   if( records == NULL)
-    fetchrecordslist(proc->recl);
-  else
-    for( i = 0; i < num_records; i++)
+    return fetchrecordslist(proc->recl);
+  else{
+    for( i = 0; (i < num_records) && (records[i] != NULL); i++)
       printrecord(records[i]);
+    return i;
+  }
 }
 
 int addrecordtolist(reclist list, struct record rec){
@@ -151,18 +153,14 @@ void printrecord(struct record rec){
     }
 }
 
-
-
-
-
-
 int fetchrecordslist(reclist list){
   reclist runner;
-  
-  for(runner = list; runner != NULL; runner = runner->next)
+  int cnt;  
+
+  for(cnt = 0, runner = list; runner != NULL; runner = runner->next, cnt++)
     printrecord(runner->rec);
     
-  return 1;
+  return cnt;
 }
 
 int releaserecordslist(reclist list){
