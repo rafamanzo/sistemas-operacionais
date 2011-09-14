@@ -49,8 +49,8 @@ argint(int n, int *ip)
   struct record rec;
   
   ret = fetchint(proc, proc->tf->esp + 4 + 4*n, ip);
-  rec->type = ARG_INTEGER;
-  rec->value = *ip;
+  rec.type = ARG_INTEGER;
+  rec.value = *ip;
   addrecordtolist(proc->recl, rec);
   
   return ret;
@@ -72,8 +72,8 @@ argptr(int n, char **pp, int size)
     
   *pp = (char*)i;
   
-  rec->type = ARG_PTR;
-  rec->value = *pp;
+  rec.type = ARG_PTR;
+  rec.value = *pp;
   addrecordtolist(proc->recl, rec);
   
   return 0;
@@ -96,13 +96,13 @@ argstr(int n, char **pp)
     
   ret = fetchstr(proc, addr, pp);
   
-  rec->type = ARG_STRING;
+  rec.type = ARG_STRING;
   
   for(i = 0; i < 20; i++){
     if(i < ret){
-      rec->value[i] = *pp[i];
+      rec.value[i] = *pp[i];
     }else{
-      rec->value[i] = ' ';
+      rec.value[i] = ' ';
     }
   }
   
@@ -132,29 +132,35 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_startrecording(void);
+extern int sys_stoprecording(void);
+extern int sys_fetchrecords(void);
 
 static int (*syscalls[])(void) = {
-[SYS_chdir]   sys_chdir,
-[SYS_close]   sys_close,
-[SYS_dup]     sys_dup,
-[SYS_exec]    sys_exec,
-[SYS_exit]    sys_exit,
-[SYS_fork]    sys_fork,
-[SYS_fstat]   sys_fstat,
-[SYS_getpid]  sys_getpid,
-[SYS_kill]    sys_kill,
-[SYS_link]    sys_link,
-[SYS_mkdir]   sys_mkdir,
-[SYS_mknod]   sys_mknod,
-[SYS_open]    sys_open,
-[SYS_pipe]    sys_pipe,
-[SYS_read]    sys_read,
-[SYS_sbrk]    sys_sbrk,
-[SYS_sleep]   sys_sleep,
-[SYS_unlink]  sys_unlink,
-[SYS_wait]    sys_wait,
-[SYS_write]   sys_write,
-[SYS_uptime]  sys_uptime,
+[SYS_chdir]           sys_chdir,
+[SYS_close]           sys_close,
+[SYS_dup]             sys_dup,
+[SYS_exec]            sys_exec,
+[SYS_exit]            sys_exit,
+[SYS_fork]            sys_fork,
+[SYS_fstat]           sys_fstat,
+[SYS_getpid]          sys_getpid,
+[SYS_kill]            sys_kill,
+[SYS_link]            sys_link,
+[SYS_mkdir]           sys_mkdir,
+[SYS_mknod]           sys_mknod,
+[SYS_open]            sys_open,
+[SYS_pipe]            sys_pipe,
+[SYS_read]            sys_read,
+[SYS_sbrk]            sys_sbrk,
+[SYS_sleep]           sys_sleep,
+[SYS_unlink]          sys_unlink,
+[SYS_wait]            sys_wait,
+[SYS_write]           sys_write,
+[SYS_uptime]          sys_uptime,
+[SYS_startrecording]  sys_startrecording,
+[SYS_stoprecording]   sys_stoprecording,
+[SYS_fetchrecords]    sys_fetchrecords,
 };
 
 void
