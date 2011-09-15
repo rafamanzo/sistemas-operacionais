@@ -1,5 +1,8 @@
+#include<stdlib.h>
 #include "record.h"
 #include "proc.h"
+
+#define NULL 0
 
 int startrecording(){
   if( proc->recording == 0 ){

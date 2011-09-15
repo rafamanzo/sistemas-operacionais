@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "spinlock.h"
 
+#define NULL 0
+
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -188,8 +190,8 @@ exit(void)
   iput(proc->cwd);
   proc->cwd = 0;
   
-  releaserecordslist(proc->reclist);
-  proc->reclist = NULL;
+  releaserecordslist(proc->recl);
+  proc->recl = NULL;
   proc->recording = 0;
 
   acquire(&ptable.lock);
@@ -239,8 +241,8 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
-        releaserecordslist(proc->reclist);
-        proc->reclist = NULL;
+        releaserecordslist(proc->recl);
+        proc->recl = NULL;
         proc->recording = 0;
         release(&ptable.lock);
         return pid;
