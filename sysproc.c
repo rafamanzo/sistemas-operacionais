@@ -3,6 +3,7 @@
 #include "defs.h"
 #include "param.h"
 #include "mmu.h"
+#include "record.h"
 #include "proc.h"
 
 int

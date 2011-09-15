@@ -8,6 +8,7 @@
 #include "mp.h"
 #include "x86.h"
 #include "mmu.h"
+#include "record.h"
 #include "proc.h"
 
 struct cpu cpus[NCPU];

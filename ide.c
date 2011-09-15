@@ -4,6 +4,7 @@
 #include "defs.h"
 #include "param.h"
 #include "mmu.h"
+#include "record.h"
 #include "proc.h"
 #include "x86.h"
 #include "traps.h"

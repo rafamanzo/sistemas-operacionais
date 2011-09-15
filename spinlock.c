@@ -5,6 +5,7 @@
 #include "param.h"
 #include "x86.h"
 #include "mmu.h"
+#include "record.h"
 #include "proc.h"
 #include "spinlock.h"
 
