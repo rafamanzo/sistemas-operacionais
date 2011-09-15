@@ -72,7 +72,7 @@ argptr(int n, char **pp, int size)
     
   *pp = (char*)i;
   
-  rec.type = ARG_PTR;
+  rec.type = ARG_POINTER;
   rec.value.ptrval = *pp;
   addrecordtolist(proc->recl, rec);
   
@@ -166,7 +166,7 @@ void
 syscall(void)
 {
   int num;
-  int ret;
+  int ret = 0;
   struct record rec_no, rec_ret;
   
   num = proc->tf->eax;
@@ -175,10 +175,10 @@ syscall(void)
   rec_no.value.intval = num;
   addrecordtolist(proc->recl, rec_no);
   
-  if(num >= 0 && num < NELEM(syscalls) && syscalls[num])
+  if(num >= 0 && num < NELEM(syscalls) && syscalls[num]){
     ret = syscalls[num]();
     proc->tf->eax = ret;
-  else {
+  }else {
     cprintf("%d %s: unknown sys call %d\n",
             proc->pid, proc->name, num);
     proc->tf->eax = -1;
