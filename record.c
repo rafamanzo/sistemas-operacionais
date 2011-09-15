@@ -1,4 +1,7 @@
-#include<stdlib.h>
+#include "types.h"
+#include "defs.h"
+#include "param.h"
+#include "mmu.h"
 #include "record.h"
 #include "proc.h"
 
@@ -20,69 +23,9 @@ int stoprecording(){
   return -1;
 }
 
-int fetchrecords(struct record *records, int num_records){
-  int i;
-   
-  if( records == NULL)
-    return fetchrecordslist(proc->recl);
-  else{
-    for( i = 0; (i < num_records) && (records[i] != NULL); i++)
-      printrecord(records[i]);
-    return i;
-  }
-}
-
-int addrecordtolist(reclist list, struct record rec){
-  reclist aux;
-
-  if( list == NULL){
-    if( (list = kalloc()) == 0)
-       return 0;
-    list -> rec = rec;
-    list -> next = NULL;
-   }
-  for( aux = list; aux -> next != NULL; aux =  aux -> next);
-
-  if( (aux -> next = kalloc()) == 0 )
-    return 0;
-  aux = aux -> next;
-  aux -> rec = rec;
-  aux -> next = NULL;  
-
-  return 1;
-}
-
-reclist copyrecordslist(reclist list){
-  reclist new, aux, ant;
-  new = aux = ant = NULL;
-
-  /* Como a lista não possui cabeça tratamos o primeiro caso separadamente */
-  if(list != NULL){
-      if( (aux = kalloc()) == 0 )
-        return NULL;
-      aux -> rec = list -> rec;
-      aux -> next = NULL;
-      ant = aux;
-      list = list -> next;
-      new = aux;
-      aux = NULL;
-  } 
-  while( list != NULL ){
-      if( (aux = kalloc()) == 0 )
-        return NULL;
-      aux -> rec = list -> rec;
-      ant -> next = aux;
-      ant = aux;
-      aux = NULL;
-      list = list -> next;
-  }
-  return new;
-}
-
 /* Tranforma o numero da System Call no respectivo nome */
 char* translatesyscall(int sc){
-
-  switch(sc)
+  switch(sc){
     case 1:
       return "SYS_fork";
     case 2:
@@ -133,27 +76,86 @@ char* translatesyscall(int sc){
       return "SYS_fetchrecords";
     default:
       return "Doesn't exist";
+  }
 }
 
-void printrecord(struct record rec){
-  
+void printrecord(struct record rec){  
   switch(rec.type){
     case SYSCALL_NO:
         cprintf("SYSCALL_NO: %s\n",translatesyscall(rec.value.intval));
         break;
     case ARG_INTEGER:
-        cprintf("ARG_INTEGER: %d\n",rec.value.intval):
+        cprintf("ARG_INTEGER: %d\n",rec.value.intval);
         break;
     case ARG_POINTER:
-        cprintf("ARG_POINTER: %p\n",rec.value.ptrvalue):
+        cprintf("ARG_POINTER: %p\n",rec.value.ptrval);
         break;
     case ARG_STRING:
-        cprintf("ARG_STRING: %s\n",rec.value.strval):
+        cprintf("ARG_STRING: %s\n",rec.value.strval);
         break;
     case RET_VALUE:
-        cprintf("RET_VALUE: %d\n",rec.value.intval):
+        cprintf("RET_VALUE: %d\n",rec.value.intval);
         break;
     }
+}
+
+int fetchrecords(struct record *records, int num_records){
+  int i;
+   
+  if( records == NULL)
+    return fetchrecordslist(proc->recl);
+  else{
+    for( i = 0; (i < num_records); i++)
+      printrecord(records[i]);
+    return i;
+  }
+}
+
+int addrecordtolist(reclist *list, struct record rec){
+  reclist aux;
+
+  if( *list == NULL){
+    if( (*list = (reclist) kalloc()) == 0)
+       return 0;
+    (*list)->rec = rec;
+    (*list)->next = NULL;
+   }
+  for( aux = *list; aux -> next != NULL; aux =  aux -> next);
+
+  if( (aux -> next = (reclist) kalloc()) == 0 )
+    return 0;
+  aux = aux -> next;
+  aux -> rec = rec;
+  aux -> next = NULL;  
+
+  return 1;
+}
+
+reclist copyrecordslist(reclist list){
+  reclist new, aux, ant;
+  new = aux = ant = NULL;
+
+  /* Como a lista não possui cabeça tratamos o primeiro caso separadamente */
+  if(list != NULL){
+      if( (aux = (reclist) kalloc()) == 0 )
+        return NULL;
+      aux -> rec = list -> rec;
+      aux -> next = NULL;
+      ant = aux;
+      list = list -> next;
+      new = aux;
+      aux = NULL;
+  } 
+  while( list != NULL ){
+      if( (aux = (reclist) kalloc()) == 0 )
+        return NULL;
+      aux -> rec = list -> rec;
+      ant -> next = aux;
+      ant = aux;
+      aux = NULL;
+      list = list -> next;
+  }
+  return new;
 }
 
 int fetchrecordslist(reclist list){
@@ -173,7 +175,7 @@ int releaserecordslist(reclist list){
   
   while(runner != NULL){
     next = runner->next;
-    kfree(runner);
+    kfree( (char *) runner );
     runner = next; 
   }
   
