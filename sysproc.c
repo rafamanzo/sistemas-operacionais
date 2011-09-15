@@ -88,3 +88,26 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_startrecording(void){
+  return startrecording();
+}
+
+int
+sys_stoprecording(void){
+  return startrecording();
+}
+
+int
+sys_fetchrecords(void){
+  int n;
+  char *p;
+
+  if(argint(0, &n) < 0)
+    return -1;
+  if(argptr(1, &p, 25*n) < 0); //a estrutura record possui 25bytes, logo 25*n 
+    return -1;
+
+  return fetchrecords((struct record *) p, n);
+}
