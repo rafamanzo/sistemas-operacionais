@@ -46,12 +46,12 @@ int
 argint(int n, int *ip)
 {
   int ret;
-  struct record rec;
+  //struct record rec;
   
   ret = fetchint(proc, proc->tf->esp + 4 + 4*n, ip);
-  rec.type = ARG_INTEGER;
+  /*rec.type = ARG_INTEGER;
   rec.value.intval = *ip;
-  addrecordtolist(&proc->recl, rec);
+  addrecordtolist(&proc->recl, rec);*/
   
   return ret;
 }
@@ -63,7 +63,7 @@ int
 argptr(int n, char **pp, int size)
 {
   int i;
-  struct record rec;
+  //struct record rec;
   
   if(argint(n, &i) < 0)
     return -1;
@@ -72,9 +72,9 @@ argptr(int n, char **pp, int size)
     
   *pp = (char*)i;
   
-  rec.type = ARG_POINTER;
+  /*rec.type = ARG_POINTER;
   rec.value.ptrval = *pp;
-  addrecordtolist(&proc->recl, rec);
+  addrecordtolist(&proc->recl, rec);*/
   
   return 0;
 }
@@ -88,15 +88,15 @@ argstr(int n, char **pp)
 {
   int addr;
   int ret;
-  int i;
-  struct record rec;
+  /*int i;
+  struct record rec;*/
   
   if(argint(n, &addr) < 0)
     return -1;
     
   ret = fetchstr(proc, addr, pp);
   
-  rec.type = ARG_STRING;
+  /*rec.type = ARG_STRING;
   
   for(i = 0; i < 20; i++){
     if(i < ret){
@@ -105,7 +105,7 @@ argstr(int n, char **pp)
       rec.value.strval[i] = ' ';
     }
   }
-  addrecordtolist(&proc->recl, rec);
+  addrecordtolist(&proc->recl, rec);*/
   
   return ret;
 }
@@ -167,13 +167,13 @@ syscall(void)
 {
   int num;
   int ret = 0;
-  struct record rec_no, rec_ret;
+  //struct record rec_no, rec_ret;
   
   num = proc->tf->eax;
   
-  rec_no.type = SYSCALL_NO;
+  /*rec_no.type = SYSCALL_NO;
   rec_no.value.intval = num;
-  addrecordtolist(&proc->recl, rec_no);
+  addrecordtolist(&proc->recl, rec_no);*/
   
   if(num >= 0 && num < NELEM(syscalls) && syscalls[num]){
     ret = syscalls[num]();
@@ -184,7 +184,7 @@ syscall(void)
     proc->tf->eax = -1;
   }
   
-  rec_ret.type = RET_VALUE;
+  /*rec_ret.type = RET_VALUE;
   rec_ret.value.intval = ret;
-  addrecordtolist(&proc->recl, rec_ret);
+  addrecordtolist(&proc->recl, rec_ret);*/
 }

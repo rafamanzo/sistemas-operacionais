@@ -8,6 +8,7 @@
 #define NULL 0
 
 int startrecording(){
+  cprintf("start recording\n");
   if( proc->recording == 0 ){
     proc->recording = 1;
     return 0;
@@ -16,6 +17,7 @@ int startrecording(){
 }
 
 int stoprecording(){
+  cprintf("stop recording\n");
   if( proc->recording == 1 ){
     proc->recording = 0;
     return 0;
@@ -25,6 +27,7 @@ int stoprecording(){
 
 /* Tranforma o numero da System Call no respectivo nome */
 char* translatesyscall(int sc){
+  cprintf("translate syscall\n");
   switch(sc){
     case 1:
       return "SYS_fork";
@@ -80,6 +83,7 @@ char* translatesyscall(int sc){
 }
 
 void printrecord(struct record rec){  
+  cprintf("print record\n");
   switch(rec.type){
     case SYSCALL_NO:
         cprintf("SYSCALL_NO: %s\n",translatesyscall(rec.value.intval));
@@ -102,6 +106,7 @@ void printrecord(struct record rec){
 int fetchrecords(struct record *records, int num_records){
   int i;
    
+  cprintf("fetch records\n");
   if( records == NULL)
     return fetchrecordslist(proc->recl);
   else{
@@ -113,6 +118,11 @@ int fetchrecords(struct record *records, int num_records){
 
 int addrecordtolist(reclist *list, struct record rec){
   reclist aux;
+
+  cprintf("add record to list\n");
+  if(!proc->recording)
+    return 0;
+  cprintf("passou\n");
 
   if( *list == NULL){
     if( (*list = (reclist) kalloc()) == 0)
@@ -135,6 +145,7 @@ reclist copyrecordslist(reclist list){
   reclist new, aux, ant;
   new = aux = ant = NULL;
 
+  cprintf("copy records list\n");
   /* Como a lista não possui cabeça tratamos o primeiro caso separadamente */
   if(list != NULL){
       if( (aux = (reclist) kalloc()) == 0 )
@@ -162,6 +173,7 @@ int fetchrecordslist(reclist list){
   reclist runner;
   int cnt;  
 
+  cprintf("fetch records list\n");
   for(cnt = 0, runner = list; runner != NULL; runner = runner->next, cnt++)
     printrecord(runner->rec);
     
@@ -170,7 +182,8 @@ int fetchrecordslist(reclist list){
 
 int releaserecordslist(reclist list){
   reclist runner, next;
-  
+
+  cprintf("release records\n");  
   runner = list; 
   
   while(runner != NULL){

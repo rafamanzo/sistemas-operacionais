@@ -56,7 +56,12 @@ found:
     return 0;
   }
   sp = p->kstack + KSTACKSIZE;
-  
+
+  // Set up syscall recording structure
+  /*sp -= 4096;
+  p->recording = 0;
+  p->recl = NULL;*/
+
   // Leave room for trap frame.
   sp -= sizeof *p->tf;
   p->tf = (struct trapframe*)sp;
@@ -71,9 +76,6 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
   
-  // Set up syscall recording structure
-  p->recording = 0;
-  p->recl = NULL;
 
   return p;
 }
@@ -158,8 +160,8 @@ fork(void)
       np->ofile[i] = filedup(proc->ofile[i]);
   np->cwd = idup(proc->cwd);
   
-  np->recording = proc->recording;
-  np->recl = copyrecordslist(proc->recl);
+  /*np->recording = proc->recording;
+  np->recl = copyrecordslist(proc->recl);*/
  
   pid = np->pid;
   np->state = RUNNABLE;
@@ -190,9 +192,9 @@ exit(void)
   iput(proc->cwd);
   proc->cwd = 0;
   
-  releaserecordslist(proc->recl);
+  /*releaserecordslist(proc->recl);
   proc->recl = NULL;
-  proc->recording = 0;
+  proc->recording = 0;*/
 
   acquire(&ptable.lock);
 
@@ -241,9 +243,9 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
-        releaserecordslist(proc->recl);
+        /*releaserecordslist(proc->recl);
         proc->recl = NULL;
-        proc->recording = 0;
+        proc->recording = 0;*/
         release(&ptable.lock);
         return pid;
       }
